@@ -1,0 +1,43 @@
+openapi: 3.0.1
+info:
+  title: Prometheus exporter
+  description: Export sFlow metrics in Prometheus format
+  contact:
+    name: sFlow-RT.com
+    url: https://sflow-rt.com/
+  version: 1.0.0
+paths:
+  /export.js/dump/{agent}/{metric}/txt:
+    get:
+      tags:
+      - Exporter
+      summary: Get metric values
+      parameters:
+      - name: agent
+        in: path
+        description: IP address(es) or ALL
+        required: true
+        style: simple
+        exploded: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: metric
+        description: Metric name(s) or ALL
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: ifinoctets{agent="192.168.0.11",datasource="15",ifname="swp10",host="leaf1"} 0 
