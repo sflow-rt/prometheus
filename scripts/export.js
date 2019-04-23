@@ -6,7 +6,7 @@ function prometheusMetric(val) {
   var host = metric(val.agent,'2.1.host_name')[0].metricValue;
   if(!host) {
     let nnames = topologyNodesForAgent(val.agent);
-    host = nnames && names.length === 1 ? nnames[0] : null; 
+    host = nnames && nnames.length === 1 ? nnames[0] : null; 
   }
   if(host != null) result += ',host="'+host+'"';
   if(val.dataSource.indexOf('.') === -1) {
