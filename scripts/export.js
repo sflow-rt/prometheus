@@ -14,7 +14,31 @@ function prometheusMetric(val) {
     if(ifname) result += ',ifname="'+ifname+'"';
   } else if(val.dataSource.startsWith('3.')) {
     let vir_host = metric(val.agent,val.dataSource+'.vir_host_name')[0].metricValue;
-    if(vir_host) result += ',vir_host="'+vir_host+'"';
+    if(vir_host) {
+      if(vir_host.startsWith('k8s_')) {
+        // Parse Kubernetes dockershim name
+        // https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/dockershim/naming.go
+        if(vir_host.startsWith('k8s_POD_')) {
+          // Sandbox
+          // k8s_POD_{s.name}_{s.namespace}_{s.uid}_{s.attempt}
+          return null;
+        } else {
+          // Container
+          // k8s_{c.name}_{s.name}_{s.namespace}_{s.uid}_{c.attempt}
+          let [,name,,namespace] = vir_host.split('_');
+          if(name) result += ',k8s_name="'+name+'"';
+          if(namespace) result += ',k8s_namespace="'+namespace+'"';
+        }
+      } else {
+        // Check for Docker Swarm mode name
+        let swarm = vir_host.match(/^([^\.]+)\.([^\.]{25})\.([^\.]{25})$/);
+        if(swarm) {
+          result += ',swarm_name="'+swarm[1]+'"'; 
+        } else {
+          result += ',vir_host="'+vir_host+'"';
+        }
+      }
+    }
   }
   result += '} ' + val.metricValue;
   return result;
