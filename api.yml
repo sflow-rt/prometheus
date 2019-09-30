@@ -10,7 +10,7 @@ paths:
   /export.js/dump/{agent}/{metric}/txt:
     get:
       tags:
-      - Exporter
+      - Metrics
       summary: Get metric values
       parameters:
       - name: agent
@@ -18,11 +18,13 @@ paths:
         description: IP address(es) or ALL
         required: true
         style: simple
-        exploded: false
+        explode: false
         schema:
           type: array
           items:
             type: string
+        example:
+        - ALL
       - name: metric
         description: Metric name(s) or ALL
         in: path
@@ -33,6 +35,8 @@ paths:
           type: array
           items:
             type: string
+        example:
+        - ALL
       responses:
         200:
           description: OK
@@ -40,4 +44,108 @@ paths:
             text/plain:
               schema:
                 type: string
-              example: ifinoctets{agent="192.168.0.11",datasource="15",ifname="swp10",host="leaf1"} 0 
+              example: ifinoctets{agent="192.168.0.11",datasource="15",ifname="swp10",host="leaf1"} 0
+  /export.js/flows/{agent}/txt:
+    get:
+      tags:
+        - Flows
+      summary: Get flow values
+      parameters:
+      - name: agent
+        in: path
+        description: IP address(es) or ALL
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+        example:
+        - ALL
+      - name: metric
+        in: query
+        description: Metric name
+        required: true
+        schema:
+          type: string
+      - name: key
+        in: query
+        description: Flow key(s)
+        required: true
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+        example:
+        - ipsource
+      - name: value
+        in: query
+        description: Flow value
+        required: true
+        schema:
+          type: string
+        example: bytes
+      - name: filter
+        in: query
+        description: Filter flow attributes
+        required: false
+        schema:
+          type: string
+      - name: n
+        in: query
+        description: Number of largest flow entries to maintain
+        required: false
+        schema:
+          type: integer
+      - name: t
+        in: query
+        description: Smooting factor (in seconds)
+        required: false
+        schema:
+          type: integer
+      - name: label
+        in: query
+        description: Label flow key(s)
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: aggMode
+        in: query
+        description: Method of aggregating duplicate flow records
+        required: false
+        schema:
+          type: string
+          enum: [sum,max]
+      - name: maxFlows
+        in: query
+        description: Maximum number of flow records to return
+        required: false
+        schema:
+          type: integer
+      - name: minValue
+        in: query
+        description: Only report flows exceeding specified value
+        required: false
+        schema:
+          type: float
+      - name: scale
+        in: query
+        description: Scale values by specified amount
+        required: false
+        schema:
+          type: float
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: pair{src="10.0.0.1",dst="10.0.0.2"} 10.1
