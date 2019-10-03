@@ -7,6 +7,64 @@ info:
     url: https://sflow-rt.com/
   version: 1.0.0
 paths:
+  /export.js/analyzer/txt:
+    get:
+      tags:
+      - Analyzer
+      summary: Get sFlow-RT performance metrics
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: rt_sflow_agents 12
+  /export.js/statistics/{group}/{agent}/{metric}/txt:
+    get:
+      tags:
+      - Metrics
+      summary: Get summary statistics
+      parameters:
+      - name: group
+        in: path
+        description: Label used group statistics
+        required: true
+        schema:
+          type: string
+        example: cluster 
+      - name: agent
+        in: path
+        description: IP address(es) or ALL
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+        example:
+        - ALL
+      - name: metric
+        description: Metric name(s)
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+        example:
+        - max:load_one
+      responses:
+        200:
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: max:load_one{group="cluster"} 11.2
   /export.js/dump/{agent}/{metric}/txt:
     get:
       tags:

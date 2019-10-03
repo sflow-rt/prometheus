@@ -1,8 +1,62 @@
 // author: InMon Corp.
-// version: 0.8
-// date: 10/30/2019
+// version: 0.9
+// date: 10/3/2019
 // description: Prometheus exporter
 // copyright: Copyright (c) 2019 InMon Corp. ALL RIGHTS RESERVED
+
+
+function fixName(str) {
+  return str.replace(/[^a-zA-Z0-9:_]/g,'_');
+}
+
+function getAnalyzer() {
+  var res = analyzer();
+
+  var result = 'rt_uptime_ms '+res.uptime+'\n';
+  result += 'rt_sflow_agents '+res.sFlowAgents+'\n';
+  result += 'rt_sflow_datagrams_received '+res.sFlowDatagramsReceived+'\n';
+  result += 'rt_sflow_bytes_received '+res.sFlowBytesReceived+'\n';
+  result += 'rt_sflow_parse_errors '+res.sFlowParseErrors+'\n';
+  result += 'rt_sflow_unsupported_version '+res.sFlowUnsupportedVersion+'\n';
+  result += 'rt_sflow_datagrams_discarded '+res.sFlowDatagramsDiscarded+'\n';
+  result += 'rt_http_connections_current '+res.httpConnectionsCurrent+'\n';
+  result += 'rt_http_connections_total '+res.httpConnectionsTotal+'\n';
+  result += 'rt_http_messages_sent '+res.httpBytesSent+'\n';
+  result += 'rt_http_messages_received '+res.httpMessagesReceived+'\n';
+  result += 'rt_http_bytes_sent '+res.httpBytesSent+'\n';
+  result += 'rt_http_bytes_received '+res.httpBytesReceived+'\n';
+  result += 'rt_available_processors '+res.availableProcessors+'\n';
+  result += 'rt_heap_max '+res.heapMax+'\n';
+  result += 'rt_heap_used '+res.heapUsed+'\n';
+  result += 'rt_thread_total_started '+res.threadTotalStartedCount+'\n';
+  result += 'rt_thread_count '+res.threadCount+'\n';
+  result += 'rt_thread_daemon_count '+res.threadDaemonCount+'\n';
+  result += 'rt_gc_time_ms '+res.gcTime+'\n';
+  result += 'rt_gc_count '+res.gcCount+'\n';
+  result += 'rt_flows_generated '+res.flowsGenerated+'\n';
+  result += 'rt_events_generated '+res.eventsGenerated+'\n';
+  if(res.cpuTime) result += 'rt_cpu_time_ms '+res.cpuTime+'\n';
+  if(res.memTotal) result += 'rt_mem_total '+res.memTotal+'\n';
+  if(res.memFree) result += 'rt_mem_free '+res.memFree+'\n';
+  if(res.cpuLoadSystem) result += 'rt_cpu_load_system '+res.cpuLoadSystem+'\n';
+  if(res.cpuLoadProcess) result += 'rt_cpu_load_process '+res.cpuLoadProcess+'\n';
+
+  return result;
+}
+
+function getMetric(group,agents,names,filter) {
+  var i, result = [], vals = metric(agents,names,filter);
+  if(!vals) return null;
+
+  for(i = 0; i < vals.length; i++) {
+    let val = vals[i];
+    if('number' !== typeof val.metricValue) continue;
+
+    let rec = fixName(val.metricName)+'{group="'+group+'"} '+val.metricValue+'\n';
+    result.push(rec); 
+  }
+  return result.join('');
+}
 
 function prometheusMetric(val) {
 
@@ -12,7 +66,7 @@ function prometheusMetric(val) {
   // ignore string metrics
   if('number' !== typeof val.metricValue) return null;
 
-  var result =  val.metricName.replace(/[^a-zA-Z0-9:_]/g,'_');
+  var result =  fixName(val.metricName);
   result += '{agent="'+val.agent+'",datasource="'+val.dataSource+'"';
   var host = metric(val.agent,'2.1.host_name')[0].metricValue;
   if(!host) {
@@ -51,7 +105,7 @@ function prometheusMetric(val) {
       }
     }
   }
-  result += '} ' + val.metricValue;
+  result += '} ' + val.metricValue + '\n';
   return result;
 }
 
@@ -62,7 +116,7 @@ function getDump(agents,names,filter) {
     if(!val) continue;
     result.push(val);
   }
-  return result.join('\n');
+  return result.join('');
 }
 
 var specID = 0;
@@ -110,13 +164,13 @@ setIntervalHandler(function(now) {
 });
 
 function prometheusFlow(metric,keynames,flow,scale) {
-  var i, result = metric.replace(/[^a-zA-Z0-9:_]/g,'_'), keys = flow.key.split(SEP);
+  var i, result = fixName(metric), keys = flow.key.split(SEP);
   result += '{';
   for(i = 0; i < keys.length; i++) {
     if(i > 0) result += ',';
-    result += keynames[i].replace(/[^a-zA-Z0-9:_]/g,'_') + '="'+keys[i]+'"';
+    result += fixName(keynames[i]) + '="'+keys[i]+'"';
   }
-  result += '} ' + (flow.value * scale);
+  result += '} ' + (flow.value * scale) + '\n';
   return result;
 }
 
@@ -152,13 +206,21 @@ function getFlows(agents,query) {
   for(i = 0; i < flows.length; i++) {
     result.push(prometheusFlow(metric,keynames,flows[i],scale));
   }
-  return result.join('\n'); 
+  return result.join(''); 
 }
 
 setHttpHandler(function(req) {
   var result, path = req.path;
   if(!path || path.length === 0) throw 'not_found';
   switch(path[0]) {
+    case 'analyzer':
+      if(path.length !== 1) throw 'now_found';
+      result = getAnalyzer();
+      break;
+    case 'statistics':
+      if(path.length !== 4) throw 'not_found'
+      result = getMetric(path[1],path[2],path[3],req.query);
+      break;
     case 'dump':
       if(path.length !== 3) throw 'not_found';
       result = getDump(path[1],path[2],req.query);
