@@ -1,45 +1,46 @@
 // author: InMon Corp.
-// version: 0.9
-// date: 10/3/2019
+// version: 1.0
+// date: 10/8/2019
 // description: Prometheus exporter
 // copyright: Copyright (c) 2019 InMon Corp. ALL RIGHTS RESERVED
 
+const prefix = getSystemProperty('prometheus.prefix') || 'sflow_';
 
 function fixName(str) {
-  return str.replace(/[^a-zA-Z0-9:_]/g,'_');
+  return str.replace(/[^a-zA-Z0-9_]/g,'_');
 }
 
 function getAnalyzer() {
   var res = analyzer();
 
-  var result = 'rt_uptime_ms '+res.uptime+'\n';
-  result += 'rt_sflow_agents '+res.sFlowAgents+'\n';
-  result += 'rt_sflow_datagrams_received '+res.sFlowDatagramsReceived+'\n';
-  result += 'rt_sflow_bytes_received '+res.sFlowBytesReceived+'\n';
-  result += 'rt_sflow_parse_errors '+res.sFlowParseErrors+'\n';
-  result += 'rt_sflow_unsupported_version '+res.sFlowUnsupportedVersion+'\n';
-  result += 'rt_sflow_datagrams_discarded '+res.sFlowDatagramsDiscarded+'\n';
-  result += 'rt_http_connections_current '+res.httpConnectionsCurrent+'\n';
-  result += 'rt_http_connections_total '+res.httpConnectionsTotal+'\n';
-  result += 'rt_http_messages_sent '+res.httpBytesSent+'\n';
-  result += 'rt_http_messages_received '+res.httpMessagesReceived+'\n';
-  result += 'rt_http_bytes_sent '+res.httpBytesSent+'\n';
-  result += 'rt_http_bytes_received '+res.httpBytesReceived+'\n';
-  result += 'rt_available_processors '+res.availableProcessors+'\n';
-  result += 'rt_heap_max '+res.heapMax+'\n';
-  result += 'rt_heap_used '+res.heapUsed+'\n';
-  result += 'rt_thread_total_started '+res.threadTotalStartedCount+'\n';
-  result += 'rt_thread_count '+res.threadCount+'\n';
-  result += 'rt_thread_daemon_count '+res.threadDaemonCount+'\n';
-  result += 'rt_gc_time_ms '+res.gcTime+'\n';
-  result += 'rt_gc_count '+res.gcCount+'\n';
-  result += 'rt_flows_generated '+res.flowsGenerated+'\n';
-  result += 'rt_events_generated '+res.eventsGenerated+'\n';
-  if(res.cpuTime) result += 'rt_cpu_time_ms '+res.cpuTime+'\n';
-  if(res.memTotal) result += 'rt_mem_total '+res.memTotal+'\n';
-  if(res.memFree) result += 'rt_mem_free '+res.memFree+'\n';
-  if(res.cpuLoadSystem) result += 'rt_cpu_load_system '+res.cpuLoadSystem+'\n';
-  if(res.cpuLoadProcess) result += 'rt_cpu_load_process '+res.cpuLoadProcess+'\n';
+  var result = prefix+'rt_uptime_ms '+res.uptime+'\n';
+  result += prefix+'rt_agents '+res.sFlowAgents+'\n';
+  result += prefix+'rt_datagrams_received '+res.sFlowDatagramsReceived+'\n';
+  result += prefix+'rt_bytes_received '+res.sFlowBytesReceived+'\n';
+  result += prefix+'rt_parse_errors '+res.sFlowParseErrors+'\n';
+  result += prefix+'rt_unsupported_version '+res.sFlowUnsupportedVersion+'\n';
+  result += prefix+'rt_datagrams_discarded '+res.sFlowDatagramsDiscarded+'\n';
+  result += prefix+'rt_http_connections_current '+res.httpConnectionsCurrent+'\n';
+  result += prefix+'rt_http_connections_total '+res.httpConnectionsTotal+'\n';
+  result += prefix+'rt_http_messages_sent '+res.httpBytesSent+'\n';
+  result += prefix+'rt_http_messages_received '+res.httpMessagesReceived+'\n';
+  result += prefix+'rt_http_bytes_sent '+res.httpBytesSent+'\n';
+  result += prefix+'rt_http_bytes_received '+res.httpBytesReceived+'\n';
+  result += prefix+'rt_available_processors '+res.availableProcessors+'\n';
+  result += prefix+'rt_heap_max '+res.heapMax+'\n';
+  result += prefix+'rt_heap_used '+res.heapUsed+'\n';
+  result += prefix+'rt_thread_total_started '+res.threadTotalStartedCount+'\n';
+  result += prefix+'rt_thread_count '+res.threadCount+'\n';
+  result += prefix+'rt_thread_daemon_count '+res.threadDaemonCount+'\n';
+  result += prefix+'rt_gc_time_ms '+res.gcTime+'\n';
+  result += prefix+'rt_gc_count '+res.gcCount+'\n';
+  result += prefix+'rt_flows_generated '+res.flowsGenerated+'\n';
+  result += prefix+'rt_events_generated '+res.eventsGenerated+'\n';
+  if(res.cpuTime) result += prefix+'rt_cpu_time_ms '+res.cpuTime+'\n';
+  if(res.memTotal) result += prefix+'rt_mem_total '+res.memTotal+'\n';
+  if(res.memFree) result += prefix+'rt_mem_free '+res.memFree+'\n';
+  if(res.cpuLoadSystem) result += prefix+'rt_cpu_load_system '+res.cpuLoadSystem+'\n';
+  if(res.cpuLoadProcess) result += prefix+'rt_cpu_load_process '+res.cpuLoadProcess+'\n';
 
   return result;
 }
@@ -52,7 +53,7 @@ function getMetric(group,agents,names,filter) {
     let val = vals[i];
     if('number' !== typeof val.metricValue) continue;
 
-    let rec = fixName(val.metricName)+'{group="'+group+'"} '+val.metricValue+'\n';
+    let rec = prefix+fixName(val.metricName)+'{group="'+group+'"} '+val.metricValue+'\n';
     result.push(rec); 
   }
   return result.join('');
@@ -66,7 +67,7 @@ function prometheusMetric(val) {
   // ignore string metrics
   if('number' !== typeof val.metricValue) return null;
 
-  var result =  fixName(val.metricName);
+  var result =  prefix+fixName(val.metricName);
   result += '{agent="'+val.agent+'",datasource="'+val.dataSource+'"';
   var host = metric(val.agent,'2.1.host_name')[0].metricValue;
   if(!host) {

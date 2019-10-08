@@ -19,7 +19,7 @@ paths:
             text/plain:
               schema:
                 type: string
-              example: rt_sflow_agents 12
+              example: sflow_rt_sflow_agents 12
   /export.js/statistics/{group}/{agent}/{metric}/txt:
     get:
       tags:
@@ -64,7 +64,7 @@ paths:
             text/plain:
               schema:
                 type: string
-              example: max:load_one{group="cluster"} 11.2
+              example: sflow_max_load_one{group="cluster"} 11.2
   /export.js/dump/{agent}/{metric}/txt:
     get:
       tags:
@@ -102,7 +102,7 @@ paths:
             text/plain:
               schema:
                 type: string
-              example: ifinoctets{agent="192.168.0.11",datasource="15",ifname="swp10",host="leaf1"} 0
+              example: sflow_ifinoctets{agent="192.168.0.11",datasource="15",ifname="swp10",host="leaf1"} 0
   /export.js/flows/{agent}/txt:
     get:
       tags:
