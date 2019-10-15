@@ -36,11 +36,11 @@ function getAnalyzer() {
   result += prefix+'rt_gc_count '+res.gcCount+'\n';
   result += prefix+'rt_flows_generated '+res.flowsGenerated+'\n';
   result += prefix+'rt_events_generated '+res.eventsGenerated+'\n';
-  if(res.cpuTime) result += prefix+'rt_cpu_time_ms '+res.cpuTime+'\n';
-  if(res.memTotal) result += prefix+'rt_mem_total '+res.memTotal+'\n';
-  if(res.memFree) result += prefix+'rt_mem_free '+res.memFree+'\n';
-  if(res.cpuLoadSystem) result += prefix+'rt_cpu_load_system '+res.cpuLoadSystem+'\n';
-  if(res.cpuLoadProcess) result += prefix+'rt_cpu_load_process '+res.cpuLoadProcess+'\n';
+  if(res.hasOwnProperty('cpuTime')) result += prefix+'rt_cpu_time_ms '+res.cpuTime+'\n';
+  if(res.hasOwnProperty('memTotal')) result += prefix+'rt_mem_total '+res.memTotal+'\n';
+  if(res.hasOwnProperty('memFree')) result += prefix+'rt_mem_free '+res.memFree+'\n';
+  if(res.hasOwnProperty('cpuLoadSystem')) result += prefix+'rt_cpu_load_system '+res.cpuLoadSystem+'\n';
+  if(res.hasOwnProperty('cpuLoadProcess')) result += prefix+'rt_cpu_load_process '+res.cpuLoadProcess+'\n';
 
   return result;
 }
