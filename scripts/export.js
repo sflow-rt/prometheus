@@ -22,7 +22,7 @@ function getAnalyzer() {
   result += prefix+'rt_datagrams_discarded '+res.sFlowDatagramsDiscarded+'\n';
   result += prefix+'rt_http_connections_current '+res.httpConnectionsCurrent+'\n';
   result += prefix+'rt_http_connections_total '+res.httpConnectionsTotal+'\n';
-  result += prefix+'rt_http_messages_sent '+res.httpBytesSent+'\n';
+  result += prefix+'rt_http_messages_sent '+res.httpMessagesSent+'\n';
   result += prefix+'rt_http_messages_received '+res.httpMessagesReceived+'\n';
   result += prefix+'rt_http_bytes_sent '+res.httpBytesSent+'\n';
   result += prefix+'rt_http_bytes_received '+res.httpBytesReceived+'\n';
