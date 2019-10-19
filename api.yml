@@ -65,7 +65,7 @@ paths:
               schema:
                 type: string
               example: sflow_max_load_one{group="cluster"} 11.2
-  /../../../prometheus/{agent}/{metric}/txt:
+  /../../../prometheus/statistics/{agent}/{metric}/txt:
     get:
       tags:
       - Metrics
