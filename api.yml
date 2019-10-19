@@ -7,7 +7,7 @@ info:
     url: https://sflow-rt.com/
   version: 1.0.0
 paths:
-  /export.js/analyzer/txt:
+  /../../../prometheus/analyzer/txt:
     get:
       tags:
       - Analyzer
@@ -19,7 +19,7 @@ paths:
             text/plain:
               schema:
                 type: string
-              example: sflow_rt_sflow_agents 12
+              example: sflow_analyzer_agent_count 12
   /export.js/statistics/{group}/{agent}/{metric}/txt:
     get:
       tags:
@@ -65,7 +65,7 @@ paths:
               schema:
                 type: string
               example: sflow_max_load_one{group="cluster"} 11.2
-  /export.js/dump/{agent}/{metric}/txt:
+  /../../../prometheus/{agent}/{metric}/txt:
     get:
       tags:
       - Metrics
