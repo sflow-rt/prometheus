@@ -28,17 +28,17 @@ var specID = 0;
 var userFlows = {};
 var SEP = '_SEP_';
 
-function flowSpecName(keys,value,filter,n,t) {
+function flowSpecName(keys,value,filter,n,t,dropped) {
 
   if(!keys || !value) return null;
 
-  var key = ''+keys+'#'+value+'#'+filter+'#'+n+'#'+t;
+  var key = ''+keys+'#'+value+'#'+filter+'#'+n+'#'+t+'#'+dropped;
   var entry = userFlows[key];
   if(!entry) {
     // try to create flow
     var name = 'prometheus_' + specID;
     try {
-      setFlow(name,{keys:keys, value:value, filter: filter, t:t, n:n, fs:SEP});
+      setFlow(name,{keys:keys, value:value, filter: filter, t:t, n:n, fs:SEP, dropped:dropped});
       entry = {name:name};
       userFlows[key] = entry;
       specID++;
@@ -86,16 +86,16 @@ function getFlows(agents,query) {
   var labels = query.label ? query.label.join(',') : null;
   var keys = query.key ? query.key.join(',') : null;
   var value = query.value ? query.value[0] : null;
-  var filter = query.filter ? query.filter.join('&') : null;
   var n = query.n ? query.n[0] : 10;
   var t = query.t ? query.t[0] : 15;
   var filter = query.filter ? query.filter[0] : null;
-  var aggMode = query.aggMode ? query.aggMode[0] : 'max';
+  var dropped = query.dropped ? "true" === query.dropped[0] : false;
+  var aggMode = query.aggMode ? query.aggMode[0] : dropped ? 'sum' : 'max';
   var maxFlows = query.maxFlows ? query.maxFlows[0] : 20;
   var minValue = query.minValue ? query.minValue[0] : 0.1;
   var scale = query.scale ? parseFloat(query.scale[0]) : 1.0;
   
-  var spec_name = flowSpecName(keys,value,filter,n,t);
+  var spec_name = flowSpecName(keys,value,filter,n,t,dropped);
   if(!spec_name) throw 'bad_request';
 
   var i, keynames = keys.split(',');
