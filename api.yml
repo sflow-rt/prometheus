@@ -35,7 +35,7 @@ paths:
         example: cluster 
       - name: agent
         in: path
-        description: IP address(es) or ALL
+        description: IP address(es) or ALL or TOPOLOGY
         required: true
         style: simple
         explode: false
@@ -73,7 +73,7 @@ paths:
       parameters:
       - name: agent
         in: path
-        description: IP address(es) or ALL
+        description: IP address(es) or ALL or TOPOLOGY
         required: true
         style: simple
         explode: false
@@ -111,7 +111,7 @@ paths:
       parameters:
       - name: agent
         in: path
-        description: IP address(es) or ALL
+        description: IP address(es) or ALL or TOPOLOGY
         required: true
         style: simple
         explode: false
@@ -180,7 +180,7 @@ paths:
         required: false
         schema:
           type: string
-          enum: [sum,max]
+          enum: [sum,max,edge,core]
       - name: maxFlows
         in: query
         description: Maximum number of flow records to return
