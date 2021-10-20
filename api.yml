@@ -1,34 +1,21 @@
 openapi: 3.0.1
 info:
   title: Prometheus exporter
-  description: Export sFlow metrics in Prometheus format
+  description: Export summary statistics and flow metrics in Prometheus format. See [RESTflow API](../../../api/index.html#/prometheus) for additional Prometheus exporters.
   contact:
     name: sFlow-RT.com
     url: https://sflow-rt.com/
   version: 1.0.0
 paths:
-  /../../../prometheus/analyzer/txt:
-    get:
-      tags:
-      - Analyzer
-      summary: Get sFlow-RT performance metrics
-      responses:
-        200:
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: string
-              example: sflow_analyzer_agent_count 12
   /export.js/statistics/{group}/{agent}/{metric}/txt:
     get:
       tags:
-      - Metrics
+      - Statistics
       summary: Get summary statistics
       parameters:
       - name: group
         in: path
-        description: Label used group statistics
+        description: Label used to group statistics
         required: true
         schema:
           type: string
@@ -57,6 +44,17 @@ paths:
             type: string
         example:
         - max:load_one
+      - name: filter
+        in: query
+        description: Filter data sources
+        required: false
+        style: form
+        schema:
+          type: object
+          items:
+            type: array
+            items:
+              type: string
       responses:
         200:
           description: OK
@@ -65,44 +63,6 @@ paths:
               schema:
                 type: string
               example: sflow_max_load_one{group="cluster"} 11.2
-  /../../../prometheus/metrics/{agent}/{metric}/txt:
-    get:
-      tags:
-      - Metrics
-      summary: Get metric values
-      parameters:
-      - name: agent
-        in: path
-        description: IP address(es) or ALL or TOPOLOGY
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: array
-          items:
-            type: string
-        example:
-        - ALL
-      - name: metric
-        description: Metric name(s) or ALL
-        in: path
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: array
-          items:
-            type: string
-        example:
-        - ALL
-      responses:
-        200:
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: string
-              example: sflow_ifinoctets{agent="192.168.0.11",datasource="15",ifname="swp10",host="leaf1"} 0
   /export.js/flows/{agent}/txt:
     get:
       tags:
