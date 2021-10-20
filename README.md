@@ -2,6 +2,8 @@
 
 Export metrics in Prometheus format.
 
+[Flow metrics with Prometheus and Grafana](https://blog.sflow.com/2019/10/flow-metrics-with-prometheus-and-grafana.html)
+
 ## To install
 
 1. [Download sFlow-RT](https://sflow-rt.com/download.php)
