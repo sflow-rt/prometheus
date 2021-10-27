@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Prometheus exporter
-  description: Export summary statistics and flow metrics in Prometheus format. See [RESTflow API](../../../api/index.html#/prometheus) for additional Prometheus exporters.
+  description: Export summary statistics and flow metrics in Prometheus format. See [RESTflow API](../../../api/index.html) for additional Prometheus exporters.
   contact:
     name: sFlow-RT.com
     url: https://sflow-rt.com/
