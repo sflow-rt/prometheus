@@ -1,8 +1,8 @@
 // author: InMon Corp.
-// version: 1.1
-// date: 10/19/2019
+// version: 1.2
+// date: 12/18/2025
 // description: Prometheus exporter
-// copyright: Copyright (c) 2019 InMon Corp. ALL RIGHTS RESERVED
+// copyright: Copyright (c) 2019-2025 InMon Corp. ALL RIGHTS RESERVED
 
 const prefix = getSystemProperty('prometheus.metric.prefix') || 'sflow_';
 
@@ -70,6 +70,7 @@ setIntervalHandler(function(now) {
 
 function prometheusFlow(metric,keynames,flow,scale) {
   var i, result = fixName(metric), keys = flow.key.split(SEP);
+  if(keys.length !== keynames.length) throw 'internal_server_error';
   result += '{';
   for(i = 0; i < keys.length; i++) {
     if(i > 0) result += ',';
