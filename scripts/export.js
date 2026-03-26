@@ -1,24 +1,29 @@
 // author: InMon Corp.
-// version: 1.2
-// date: 12/18/2025
+// version: 1.3
+// date: 3/25/2026
 // description: Prometheus exporter
-// copyright: Copyright (c) 2019-2025 InMon Corp. ALL RIGHTS RESERVED
+// copyright: Copyright (c) 2019-2026 InMon Corp. ALL RIGHTS RESERVED
 
 const prefix = getSystemProperty('prometheus.metric.prefix') || 'sflow_';
+const includeType = getSystemProperty('prometheus.type') === 'yes';
 
 function fixName(str) {
   return str.replace(/[^a-zA-Z0-9_]/g,'_');
 }
 
 function getMetric(group,agents,names,filter) {
-  var i, result = [], vals = metric(agents,names,filter);
+  var i, result = [], dedup = new Set(), vals = metric(agents,names,filter);
   if(!vals) return null;
 
   for(i = 0; i < vals.length; i++) {
     let val = vals[i];
     if('number' !== typeof val.metricValue) continue;
 
-    let rec = prefix+fixName(val.metricName)+'{group="'+group+'"} '+val.metricValue+'\n';
+    let name = prefix+fixName(val.metricName);
+    if(dedup.has(name)) continue;
+    dedup.add(name);
+    if(includeType) result.push('# TYPE '+name+' gauge\n');
+    let rec = name+'{group="'+group+'"} '+val.metricValue+'\n';
     result.push(rec); 
   }
   return result.join('');
@@ -109,6 +114,7 @@ function getFlows(agents,query) {
 
   var result = [];
   var flows = activeFlows(agents,spec_name,maxFlows,minValue,aggMode);
+  if(includeType && flows.length) result.push('# TYPE '+fixName(metric)+' gauge\n');
   for(i = 0; i < flows.length; i++) {
     result.push(prometheusFlow(metric,keynames,flows[i],scale));
   }
