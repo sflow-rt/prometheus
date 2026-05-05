@@ -12,5 +12,5 @@ Export metrics in Prometheus format.
 
 Online help is available through web UI.
 
-For more information, visit:
+For documentation, tutorials, and community support, visit:
 https://sFlow-RT.com
